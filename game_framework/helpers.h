@@ -7,8 +7,12 @@ private:
 	T* data;
 	int size; // int because of better handle
 public:
-	my_vector();
+	my_vector() : data(nullptr), size(0);
 	my_vector(int size);
-	void append(T x);
-	void 
+	// constructor with initializer list?
+	~my_vector();
+	void push_back(T x);
+	void pop_back();
+   	friend std::ostream &operator<<(std::ostream &os, const my_vector & v);
+	// subscript operator[]
 }
