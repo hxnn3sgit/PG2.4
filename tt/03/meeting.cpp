@@ -6,8 +6,11 @@
 
 using namespace std;
 
-struct name {
+struct name_node {
+private:
 	string vorname, nachname;
+public:
+	name_node(string vorname, string nachname) : vorname(vorname), nachname(nachname) {}
 };
 
 name* create_name_array(int argc, char **argv) {
@@ -26,6 +29,32 @@ name* create_name_array(int argc, char **argv) {
 	}
 
 	return my_names;
+}
+
+class name_list {
+private:
+	name_node *head;;
+public:
+	name_list() : head(nullptr) {}
+	name_list(string vorname, string nachname);
+	~name_list();
+	// name_node create_node(string vorname, string nachname); // "helper"
+	void append_node(name_node my_node);
+	int len();
+}
+
+name_list::name_list(string vorname, string nachname) {
+	head = create_node(vorname, nachname);
+	head->next = nullptr;
+}
+
+
+
+name_node* name_list::create_node(string vorname, string nachname) {
+	name_node *new_name_node = new name_node;
+	new_name_node.vorname = vorname;
+	new_name_node.nachname = nachname;
+	return new_name_node;
 }
 
 void teilnehmer(const name *my_names, int size) {
