@@ -5,6 +5,7 @@
 using std::cout, std::endl;
 
 int main() {
+	cout << "Test" << endl;
 	Player p1("Hannes");
 
 	p1.addPoints(10);
