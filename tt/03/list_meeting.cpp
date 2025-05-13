@@ -7,49 +7,70 @@
 using namespace std;
 
 struct name_node {
-private:
-    string vorname, nachname;
 public:
-    name_node(string vorname, string nachname) : vorname(vorname), nachname(nachname) {}
+    string vorname, nachname;
+	struct name_node *next;
+public:
+	name_node() : vorname(""), nachname(""), next(nullptr) {}
+    name_node(string vorname, string nachname) : vorname(vorname), nachname(nachname), next(nullptr) {}
 };
 
 class name_list {
 private:
     name_node data;
-    name_list *next;
+    name_node *head;
 public:
-    name_list() : next(nullptr) {}
-    name_list(string vorname, string nachname);
-    ~name_list();
+    name_list() : head(nullptr) {}
+    //~name_list() { // go through list, delete everything };
     // name_node create_node(string vorname, string nachname); // "helper"
-    void append_node(name_node my_node);
+    void append_teilnehmer(char *arg);
     int len();
     friend ostream& operator<<(ostream& os, const name_list &my_list);
+	friend void teilnehmer(const name_list &my_list);
 };
 
-name_list::name_list(string vorname, string nachname) {
-    // create new name node with new and 
-    name_node *new_node = new 
-    head->next = nullptr;
-}
+vector<string> split_names(char *arg);
 
-name_node* name_list::create_node(string vorname, string nachname) {
-    name_node *new_name_node = new name_node;
-    new_name_node.vorname = vorname;
-    new_name_node.nachname = nachname;
-    return new_name_node;
-}
-
-void append_node(const char *arg) {
+void name_list::append_teilnehmer(char *arg) {
     // to do:
     // - create a name node
     // - go to end of list
     // - end of list is the new created node
+	
+	vector<string> vor_und_nachname = split_names(arg);
+	
+	name_node *new_name_node = new name_node(vor_und_nachname[0], vor_und_nachname[1]);
+	name_node *run = head;
+
+	if (head == nullptr) { 
+		head = new_name_node;
+	} else {
+		while(run->next != nullptr) { // wtf
+			run = run->next; // wtf
+		}
+		run->next = new_name_node;
+	}
 }
 
-void teilnehmer(const name_list &my_list) {
-    // iterate through list (maybe custom iterator class)
+vector<string> split_names(char *arg) {
+	vector<string> splitted_name;
+	stringstream ss(arg);
+	string token;
+	while (ss >> token)
+		splitted_name.push_back(token);
+	return splitted_name;
+}
+
+void teilnehmer(name_list &my_list) {
+    // iterate through list (maybe custom iterator class) -> later
     // print Hello and vorname from every node
+
+	name_node *run = my_list.head;
+
+	while (run) {
+		cout << "Hallo " << run->vorname << endl;
+	}
+	
 }
 
 int main(int argc, char **argv) {
@@ -58,13 +79,13 @@ int main(int argc, char **argv) {
         return -1;
     }
     
-    name_list my_list();
+    name_list my_list;
     for(int i = 1; i < argc; ++i) {
-        my_list.append_node(argv[i]);
+        my_list.append_teilnehmer(argv[i]);
     }
     
-    cout << my_list << endl;
-    teilnehmer(my_list);
+    //cout << my_list << endl;
+    //teilnehmer(my_list);
     return 0;
 } 
 
