@@ -31,10 +31,6 @@ public:
     bool operator==(const pg2_string &str_1, const pg2_string &str_2);
     bool operator!=(const pg2_string &str_1, const pg2_string &str_2);
     pg2_string operator[](const pg2_string &str, int index);
-
-
-
-
 };
 
 int main() {

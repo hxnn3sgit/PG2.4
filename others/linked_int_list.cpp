@@ -2,13 +2,15 @@
 
 using namespace std;
 
+struct node {
+    int data;
+    struct node *next;
+    node (int d) : data(d), next(nullptr) {}
+};
+
+
 class int_list {
 private:
-    struct node {
-        int data;
-        struct node *next;
-        node (int d) : data(d), next(nullptr) {}
-    };
     node *head;
 public:
     int_list() : head(nullptr) {}
@@ -21,7 +23,14 @@ public:
 };
 
 int_list::~int_list() {
-    //delete the list
+    // delete the list:
+	// - start at first node, save next node, delete current, go to next until everything is deleted;
+	node *run = head;
+	while(run) {
+		node *next = run->next;
+		delete run;
+		run = next;
+	}
 }
 
 int int_list::len() {
@@ -55,8 +64,14 @@ void int_list::append(int payload) {
 	}
 }
 
+void int_list::prepend(int payload) {
+	node *new_head = new node(payload);
+	new_head->next = head;
+	head = new_head;
+}
+
 ostream& operator<<(ostream& os, const int_list &my_list) {
-	int_list::node *run = my_list.head;
+	node *run = my_list.head;
     while (run) {
         os << "[" << run->data << "]-";
         run = run->next;
@@ -72,7 +87,7 @@ int main() {
     my_list.append(1);
     my_list.append(2);
     my_list.append(3);
-    
+   	my_list.prepend(4); 
     cout << my_list << endl;
     
     
