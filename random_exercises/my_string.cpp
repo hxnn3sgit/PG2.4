@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstring>
 
 using namespace std;
 
@@ -28,19 +29,41 @@ public:
     bool is_empty(const pg2_string &my_str);
     int find(char c);
     void clear();
-    bool operator==(const pg2_string &str_1, const pg2_string &str_2);
-    bool operator!=(const pg2_string &str_1, const pg2_string &str_2);
-    pg2_string operator[](const pg2_string &str, int index);
+    friend bool operator==(const pg2_string &str_1, const pg2_string &str_2);
+    friend bool operator!=(const pg2_string &str_1, const pg2_string &str_2);
+	friend ostream& operator<<(ostream &os, const pg2_string &my_str);
+    pg2_string operator[](int index);
 };
 
-int main() {
-    pg2_string first_str;
-    pg2_string second_str("Hannes");
-    
-    first_str = "Das ist ein Test";
-    second_str.append(" das ist lustig");
+void pg2_string::append(char *append_data) {
+	pg2_string temporary(append_data);
+	int new_len = len + temporary.len + 1;
+	char *new_data = new char [new_len]; // + 1 is already added in the original string
+	for (int i = 0; i < len; ++i) {
+		new_data[i] = data[i];
+	}
+	for (int i = len + 1, j = 0; i < new_len, j < temporary.len; ++i, ++j) {
+		new_data[i] = append_data[j];
+	}
+	new_data[new_len+1] = '\0';
+	data = new_data;
+	len = new_len;
+}
 
-    cout << first_str.substring("T", 3) << endl; // should return Tes
+ostream& operator<<(ostream &os, const pg2_string &my_str) {
+	for (int i = 0; i < my_str.len; ++i)
+		os << my_str.data[i];
+	return os;
+}
+
+int main() {
+    // pg2_string first_str;
+    pg2_string second_str("Hannes");
+    cout << "second str: " << second_str << endl;
+    //first_str = "Das ist ein Test";
+    second_str.append(" das ist lustig");
+	cout << "second str after appending: " << second_str << endl;
+    //cout << first_str.substring("T", 3) << endl; // should return Tes
     
 
 
