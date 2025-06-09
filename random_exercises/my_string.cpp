@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cstring>
+#include <cassert>
 
 using namespace std;
 
@@ -25,7 +26,7 @@ public:
 
     int lenth() { return len; }
     void append(char *append_data);
-    pg2_string substring(char c, int len);
+    pg2_string substring(char c, int length);
     bool is_empty(const pg2_string &my_str);
     int find(char c);
     void clear();
@@ -35,20 +36,73 @@ public:
     pg2_string operator[](int index);
 };
 
+void pg2_string::clear() {
+	delete [] data;
+	len = 0;
+}
+
+int pg2_string::find(char c) {
+	for (int i = 0; i < len; ++i) {
+		if (data[i] == c)
+			return i;
+	}
+	return -1;
+}
+
+bool operator==(const pg2_string &str_1, const pg2_string &str_2) {
+	if (str_1.len != str_2.len)
+		return false;
+	for (int i = 0; i < str_1.len; ++i) {
+		if (str_1.data[i] != str_2.data[i])
+			return false;
+	}
+
+	return true;
+}
+
+// my function:
 void pg2_string::append(char *append_data) {
 	pg2_string temporary(append_data);
-	int new_len = len + temporary.len + 1;
-	char *new_data = new char [new_len]; // + 1 is already added in the original string
+	int new_len = len + temporary.len;
+	char *new_data = new char [new_len + 1]; // + 1 is already added in the original string
+	
 	for (int i = 0; i < len; ++i) {
 		new_data[i] = data[i];
 	}
-	for (int i = len + 1, j = 0; i < new_len, j < temporary.len; ++i, ++j) {
-		new_data[i] = append_data[j];
+	
+	for (int j = 0; j < temporary.len; ++j) {
+		new_data[len + j] = temporary.data[j]; // copy from pg2_string, it is safer
 	}
-	new_data[new_len+1] = '\0';
+	
+	new_data[new_len] = '\0';
+	
+	delete[] data; // delete old data to ensure behaving
 	data = new_data;
 	len = new_len;
 }
+
+pg2_string pg2_string::substring(char c, int length) {
+	assert(length < len); // data.len has to be bigger than substring length
+	
+	int counter = 0;
+	while (data[counter] != '\0') {
+		if(data[counter] == c)
+			break;
+		counter++;
+	}
+
+	if (counter == len) // means starting character is not in there
+		return pg2_string("nix_gefunden");
+
+	char *temp = new char[counter];
+	for (int i = 0; i < length; ++i) {
+		temp[i] = data[counter+i];
+	}
+
+	pg2_string substr(temp);
+	delete [] temp;	
+	return substr;
+}	
 
 ostream& operator<<(ostream &os, const pg2_string &my_str) {
 	for (int i = 0; i < my_str.len; ++i)
@@ -58,14 +112,17 @@ ostream& operator<<(ostream &os, const pg2_string &my_str) {
 
 int main() {
     // pg2_string first_str;
+    pg2_string first_str("Das ist ein Test");
     pg2_string second_str("Hannes");
-    cout << "second str: " << second_str << endl;
-    //first_str = "Das ist ein Test";
-    second_str.append(" das ist lustig");
-	cout << "second str after appending: " << second_str << endl;
-    //cout << first_str.substring("T", 3) << endl; // should return Tes
-    
-
+	cout << "first_str: " << first_str << endl;
+	cout << "second_str: " << second_str << endl;
+  
+	//cout << first_str.substring('T', 3) << endl;
+	second_str.append(" du bist lustig");
+	cout <<  second_str << endl;
+	cout << "first_str.find('a'): " << first_str.find('a') << endl;
+	first_str.clear();
+	cout << "first_str after clear: " << first_str << endl;
 
     return 0;
 }
@@ -78,8 +135,8 @@ to implement:
 - copy assignment operator
 - move assignment operator
 - clear function
-- append function
-- substring function
+- append function *
+- substring function *
 - find function
 - comparison functions ( ==, !=)
 - access operator []
