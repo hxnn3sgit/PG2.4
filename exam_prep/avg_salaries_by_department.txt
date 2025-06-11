@@ -1,0 +1,4 @@
+Controlling has average loan of 4000
+HR has average loan of 4100
+IT has average loan of 4850.25
+Marketing has average loan of 3900

@@ -6,7 +6,14 @@
 #include <map>
 #include <vector>
 
-using namespace std;
+using std::cout, std::endl, std::string;
+
+class division_by_zero : public std::exception {
+public:
+	virtual const char *what() const noexcept override {
+		return "Division 
+	}
+};
 
 struct Employee {
 	std::string name;
@@ -26,11 +33,13 @@ std::map<string, float> calc_avg_salary_by_department(const std::vector<Employee
 	}
 
 	std::map<string, float> avg_salary_by_department;
-
-	/*for (const auto &pair */
-
-
 	
+	for (const auto &pair : sum_salary_by_department) {
+
+		avg_salary_by_department[pair.first] = sum_salary_by_department[pair.first] / department_counter[pair.first];
+	}
+
+	return avg_salary_by_department;
 }
 
 void process_employee_data(std::istream &in, std::vector<Employee> &employees) {
@@ -61,11 +70,16 @@ void process_employee_data(std::istream &in, std::vector<Employee> &employees) {
 			my_employee.gehalt = loan;
 		} catch (std::invalid_argument &e) {
 			my_employee.gehalt = std::numeric_limits<float>::quiet_NaN();
-			cerr << "invalid float value: " << e.what() << ", 'gehalt' is set to NaN" << endl;
+			std::cerr << "invalid float value: " << e.what() << ", 'gehalt' is set to NaN" << endl;
 		}
 	
 	employees.push_back(my_employee);
 	}
+}
+
+void write_employee_data_in_file(std::ostream &out, const std::map<string, float> &avg_salary_by_department) {
+	for (const auto &pair : avg_salary_by_department)
+		out << pair.first << " has average loan of " << pair.second << endl;
 }
 
 int main() {
@@ -75,16 +89,23 @@ int main() {
 	
 	std::vector<Employee> employees;
 	process_employee_data(read_file, employees);
-
-	for (const auto &employee : employees) {
-		cout << employee.name << ", " << employee.abteilung << ", " << employee.gehalt << endl;
-	}
 	read_file.close(); // not needed anymore
 	
-	//std::map<string, float> avg_salarys_by_department = calc_avg_salary_by_department(employees);
-
-	// iterate over map and print everything
+	std::map<string, float> avg_salarys_by_department = calc_avg_salary_by_department(employees);
+	cout << endl;
 	
+	// iterate over map and print everything
+	for (const auto &pair : avg_salarys_by_department) {
+		cout << "[" << pair.first << "] = " << pair.second << endl;
+	}
 
+	try {
+		std::ofstream avg_salary_file("avg_salaries_by_department.txt");
+		write_employee_data_in_file(avg_salary_file, avg_salarys_by_department);
+		avg_salary_file.close();
+	} catch (std::exception &e) {
+		std::cerr << "writing to file failed: " << e.what() << endl;
+	}
+	
 	return 0;
 }
