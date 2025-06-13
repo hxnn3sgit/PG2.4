@@ -11,7 +11,7 @@ using std::cout, std::endl, std::string;
 class division_by_zero : public std::exception {
 public:
 	virtual const char *what() const noexcept override {
-		return "Division 
+		return "Division by zero"; 
 	}
 };
 
