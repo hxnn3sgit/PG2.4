@@ -26,14 +26,17 @@ void concatenate(std::istream &in, bool line_flag = false) {
 	}	
 }
 
-bool check_for_line_flag(std::vector<string> &args) {
+bool check_for_and_delete_line_flag(std::vector<string> &args) {
 	bool line_flag = false;
-	for (int i = 0; i < args.size(); ++i) {
-		if (args.at(i) == "-n"){
-			args.erase(args.begin() + i);
+	
+	for (auto it = args.begin(); it != args.end(); ) {
+		if (*it == "-n"){
+			it = args.erase(it);
 			line_flag = true;
-		}
+		} else
+			++it;
 	}
+	
 	return line_flag;
 }
 
@@ -58,7 +61,7 @@ int main(int argc, char **argv) {
 		for (int i = 1; i < argc; ++i)
 			args.push_back(argv[i]);
 		
-		bool line_flag = check_for_line_flag(args);
+		bool line_flag = check_for_and_delete_line_flag(args);
 		
 		for(const auto &arg : args) {
 			try {
