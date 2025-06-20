@@ -15,8 +15,8 @@ public:
 
 void concatenate(std::istream &in, bool line_flag = false) {
 	string line;
+	int line_nr = 1;
 	if (line_flag) {
-		int line_nr = 1;
 		while (std::getline(in, line)) {
 			cout << "  " << line_nr++ << "\t" << "  "  << line << endl;
 		}
