@@ -13,14 +13,14 @@ int main(int argc, char **argv) {
 
     std::cout << "appending arguments to list" << std::endl;
 
-    for (int i = 1; i < 100; ++i) {
+    for (int i = 0; i < 100; ++i) {
         my_list.append(i);
     }
 
     std::cout << my_list << std::endl;
 
     try {
-        my_list.insertAt((34), 99999);
+        my_list.insertAt(34, 99999);
     } catch (std::out_of_range &e) {
         std::cerr << "element couldn't be inserted at position " << argc - 2 << ", " << e.what() << std::endl;
     } catch (std::runtime_error &e) {
@@ -29,7 +29,17 @@ int main(int argc, char **argv) {
 
     std::cout << "after inserting: " << std::endl << my_list << std::endl;
 
-    for (LinkedList<int>Iterator it = my_list.begin(); it != my_list.end(); ++it) {
-        
+    try {
+        my_list.deleteAt(20);
+    } catch(std::out_of_range &e) {
+        std::cerr << "element couldn't be deletet at position 20: " << e.what() << std::endl;
+    } catch(std::runtime_error &e) {
+        std::cerr << "element couldn't be deletet at position 20: " << e.what() << std::endl;
     }
+
+    std::cout << "after deleting: " << std::endl << my_list << std::endl;
+
+    /*for (LinkedList<int>Iterator it = my_list.begin(); it != my_list.end(); ++it) {
+        
+    }*/
 }

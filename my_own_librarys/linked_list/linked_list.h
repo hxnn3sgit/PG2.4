@@ -186,7 +186,29 @@ void LinkedList<T>::insertAt(size_t index, const T &value) {
 
 template<typename T>
 void LinkedList<T>::deleteAt(size_t index) {
+	// delete from list at a certain index
+	// at first, check that list is not empty and index is <= size of the list
+	// if index == zero -> pop front
+	// else: go through list with for loop, 
 
+	if (empty())
+		throw std::runtime_error("list is empty, cannot delete at index");
+
+	if(index >= size())
+		throw std::out_of_range("index is out of bounds");
+	else if (index == 0)
+		popFront();
+	else {
+		Node *run = m_Head;
+		for (size_t i = 0; i < (index - 1); ++i) {
+			run = run->next;
+		}
+		// now i am at the position before i should delete the node
+		Node *temp = run->next;
+		run->next = run->next->next;
+
+		delete temp;
+	}
 }
 
 template<typename T>
@@ -206,7 +228,7 @@ std::ostream& operator<<(std::ostream& out, const LinkedList<T> &other) {
 // ITERATORS:
 
 template<typename T>
-T& LinkedList<T>::Iterator::operator*() const { return *m_Current->value }
+T& LinkedList<T>::Iterator::operator*() const { return *m_Current->value; }
 
 template<typename T>
 T* LinkedList<T>::Iterator::operator->() const { return m_Current->value; }
@@ -218,14 +240,19 @@ typename LinkedList<T>::Iterator& LinkedList<T>::Iterator::operator++() { 	// pr
 		return m_Current;
 	} else {
 		// ist schon ende der liste, keine ahnung was dann
+		return end();
 	}
 }
 
 template<typename T>
 typename LinkedList<T>::Iterator LinkedList<T>::Iterator::operator++(int) {	// postfix increment
-	Iterator before = m_Current;
-	m_Current = m_Current->next;
-	return before;
+	if (m_Current->next != nullptr) {
+		Iterator before = m_Current;
+		m_Current = m_Current->next;
+		return before;
+	} else {
+		return end();
+	}
 }
 
 template<typename T>
