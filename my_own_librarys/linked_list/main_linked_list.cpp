@@ -17,7 +17,7 @@ int main(int argc, char **argv) {
         my_list.append(i);
     }
 
-    std::cout << my_list << std::endl;
+    /*std::cout << my_list << std::endl;
 
     try {
         my_list.insertAt(34, 99999);
@@ -39,7 +39,14 @@ int main(int argc, char **argv) {
 
     std::cout << "after deleting: " << std::endl << my_list << std::endl;
 
-    /*for (LinkedList<int>Iterator it = my_list.begin(); it != my_list.end(); ++it) {
-        
-    }*/
+    std::cout << my_list << std::endl;
+*/
+    std::cout << "iterating with iterator for loop:" << std::endl;
+    for (LinkedList<int>::Iterator it = my_list.begin(); it != my_list.end(); ++it) {
+        std::cout << *it << std::endl;
+    }
+
+    for (const auto &x : my_list)
+        std::cout << x << "\t";
+    std::cout << std::endl;
 }

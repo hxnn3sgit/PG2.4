@@ -31,6 +31,7 @@ public:
 	private:
 		Node *m_Current;
 	public:
+		Iterator() = delete;
 		Iterator(Node* start) : m_Current(start) {}
 		
 		T& operator*() const;
@@ -228,19 +229,22 @@ std::ostream& operator<<(std::ostream& out, const LinkedList<T> &other) {
 // ITERATORS:
 
 template<typename T>
-T& LinkedList<T>::Iterator::operator*() const { return *m_Current->value; }
+T& LinkedList<T>::Iterator::operator*() const { 
+	if (m_Current == nullptr)
+		throw std::runtime_error("trying do dereference nullptr");
+	return m_Current->value; 
+}
 
 template<typename T>
 T* LinkedList<T>::Iterator::operator->() const { return m_Current->value; }
 
 template<typename T>
 typename LinkedList<T>::Iterator& LinkedList<T>::Iterator::operator++() { 	// prefix increment
-	if (m_Current->next != nullptr) {
-		m_Current = m_Current->next;
-		return m_Current;
+	if (m_Current == nullptr) {
+		throw std::runtime_error("trying to access nullptr");
 	} else {
-		// ist schon ende der liste, keine ahnung was dann
-		return end();
+		m_Current = m_Current->next;
+		return *this;
 	}
 }
 
@@ -249,9 +253,9 @@ typename LinkedList<T>::Iterator LinkedList<T>::Iterator::operator++(int) {	// p
 	if (m_Current->next != nullptr) {
 		Iterator before = m_Current;
 		m_Current = m_Current->next;
-		return before;
+		return *before;
 	} else {
-		return end();
+		return m_Current = nullptr;
 	}
 }
 
@@ -262,7 +266,7 @@ bool LinkedList<T>::Iterator::operator==(const Iterator &other) const {
 
 template<typename T>
 bool LinkedList<T>::Iterator::operator!=(const Iterator &other) const {
-	return !(this == other);
+	return !(m_Current == other.m_Current);
 }
 
 template<typename T>
@@ -277,21 +281,10 @@ typename LinkedList<T>::Iterator LinkedList<T>::begin() const {
 
 template<typename T>
 typename LinkedList<T>::Iterator LinkedList<T>::end() {
-	Node *run = m_Head;
-	while (run)
-		run = run->next;
-
-	return run;
+	return Iterator(nullptr);
 }
 
 template<typename T>
 typename LinkedList<T>::Iterator LinkedList<T>::end() const {
-	if (m_Head != nullptr) {
-		Node *run = m_Head;
-		while (run)
-			run = run->next;
-
-		return Iterator(run->next);
-	} else
-		return Iterator(nullptr);
+	return Iterator(nullptr);
 }
