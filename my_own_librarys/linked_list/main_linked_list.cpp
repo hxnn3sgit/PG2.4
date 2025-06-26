@@ -11,14 +11,19 @@ int main(int argc, char **argv) {
         return EXIT_FAILURE;
     }
 
-    std::cout << "appending arguments to list" << std::endl;
+	// simple appending:
+	
+    std::cout << "appending from 0 to 99 to list" << std::endl;
 
-    for (int i = 0; i < 100; ++i) {
+    for (int i = 0; i < 5; ++i) {
         my_list.append(i);
     }
 
-    /*std::cout << my_list << std::endl;
+    std::cout << my_list << std::endl;
+	
 
+	// inserting on special position:
+	/*
     try {
         my_list.insertAt(34, 99999);
     } catch (std::out_of_range &e) {
@@ -28,9 +33,12 @@ int main(int argc, char **argv) {
     }
 
     std::cout << "after inserting: " << std::endl << my_list << std::endl;
+	*/
 
+	// deleting at certain position:
+	/*	
     try {
-        my_list.deleteAt(20);
+        my_list.deleteAt(8998);
     } catch(std::out_of_range &e) {
         std::cerr << "element couldn't be deletet at position 20: " << e.what() << std::endl;
     } catch(std::runtime_error &e) {
@@ -38,9 +46,10 @@ int main(int argc, char **argv) {
     }
 
     std::cout << "after deleting: " << std::endl << my_list << std::endl;
+	*/
 
-    std::cout << my_list << std::endl;
-*/
+	// Iterator tests:
+	/*
     std::cout << "iterating with iterator for loop:" << std::endl;
     for (LinkedList<int>::Iterator it = my_list.begin(); it != my_list.end(); ++it) {
         std::cout << *it << std::endl;
@@ -49,4 +58,34 @@ int main(int argc, char **argv) {
     for (const auto &x : my_list)
         std::cout << x << "\t";
     std::cout << std::endl;
+	*/
+
+	// Initializer List tests:
+	/*	
+	std::cout << "-----------------------------------\ninitializer list\n";
+	LinkedList<int> init_list = { 1,2,3,4,5 };
+	//LinkedList<int> init_list_2({1,2,3,4,5,6});
+
+	std::cout << init_list << std::endl;
+	//std::cout << init_list_2 << std::endl;
+
+	LinkedList<int> test_append_empty_list;
+	*/
+
+	// size function test:
+	/*	
+	int sizee = my_list.size();	
+	std::cout << sizee << std::endl;
+	*/
+
+	// cctor move ctor copy/move assign op tests:
+	
+	LinkedList<int> copied_list(my_list);
+	LinkedList<int> moved_list(std::move(copied_list));
+	
+	std::cout << "copied_list: " << copied_list << std::endl;
+	std::cout << "moved_list: " << moved_list << std::endl;
+	
+
+
 }

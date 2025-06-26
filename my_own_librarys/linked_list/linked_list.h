@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <initializer_list>
 
 template<typename T>
 class LinkedList {
@@ -9,10 +10,13 @@ class LinkedList {
 		Node *next;
 		Node(const T &value) : value(value), next(nullptr) {}
 	};
-	Node *m_Head;
+	Node *m_Head = nullptr;
+	
+	void destroy_list();
 public:
 	LinkedList() : m_Head(nullptr) {}
-	~LinkedList();
+	LinkedList(std::initializer_list<T> init_list);
+	~LinkedList() noexcept;
 	LinkedList(const LinkedList &other);
 	LinkedList(LinkedList &&other);
 	LinkedList& operator=(const LinkedList &other);
@@ -20,7 +24,7 @@ public:
 
 	void append(const T &value);
 	void prepend(const T &value);
-	void popFront();
+	void popFront(); 
 	bool empty() const;
 	size_t size() const;
 
@@ -55,20 +59,52 @@ public:
 };
 
 template<typename T>
-LinkedList<T>::~LinkedList() {
-	// delete node by node
+LinkedList<T>::LinkedList(std::initializer_list<T> init) : m_Head(nullptr) {
+	for (const auto &element : init)
+		append(element);
+}
+
+template<typename T>
+LinkedList<T>::~LinkedList() noexcept {
+	if (empty()) { // do nothing, list is empty
+		return;
+	} else {
+		Node *run = m_Head;
+		 while(run) {
+			Node *run_next = run->next;
+			delete run;
+			run = run_next;
+		}
+	}
 }
 
 // C C'tor
 template<typename T>
 LinkedList<T>::LinkedList(const LinkedList &other) {
 	// copy node by node
+	if (other.empty())
+		return;
+	else {
+		if (other.size() == 0) {
+			return; // list is empty, nothing to copy
+		} else {
+			//m_Head = other.m_Head;
+			Node *run = other.m_Head;
+			while (run) {
+				append(run->value);
+				run = run->next;
+			}
+		}
+	}
 }
 
 //Move C'tor
 template<typename T>
 LinkedList<T>::LinkedList(LinkedList &&other) {
 	// move only head pointer to new memory location
+	~LinkedList(other);
+	m_Head = other.m_Head;
+	other.m_Head = nullptr;
 }
 
 
@@ -76,12 +112,43 @@ LinkedList<T>::LinkedList(LinkedList &&other) {
 template<typename T>
 LinkedList<T>& LinkedList<T>::operator=(const LinkedList<T> &other) {
 	// same as cctor
+	if (this == other)
+		return other;
+	else {
+		if (other.empty())
+			return nullptr;
+		else {
+			//m_Head = other.m_Head;
+			Node *run = other.m_Head;
+			while (run) {
+				append(run->value);
+				run = run->next;
+			}
+		}
+	}
 }
 
 // move assignment op
 template<typename T>
 LinkedList<T>& LinkedList<T>::operator=(LinkedList<T> &&other) {
 	// same as move ctor
+	if (this == other) 
+		return other;
+	else {
+		m_Head = other.m_Head;
+		other.m_Head = nullptr;
+	}
+}
+
+template<typename T>
+void LinkedList<T>::destroy_list() {
+
+	Node *run = m_Head;
+	while (run) {
+		Node *run_next = run->next;
+		delete run;
+		run = run_next;
+	}
 }
 
 template<typename T>
@@ -98,7 +165,7 @@ void LinkedList<T>::append(const T &value) {
 	} else {
 		Node *run = m_Head;
 		while (run->next != nullptr)
-			run = run ->next;
+			run = run->next;
 		
 		run->next = new_node;
 		// run doesn't have to be deleted, it would delete the node it is pointed to
@@ -135,6 +202,8 @@ bool LinkedList<T>::empty() const {
 
 template<typename T>
 size_t LinkedList<T>::size() const {
+	// evtl anpassen: membervariable size: +1: bei erfolgreichem einfügen
+	// 									   -1: bei erfolgreichem löschen
 	if (m_Head == nullptr)
 		return 0;
 	else {
@@ -157,6 +226,8 @@ void LinkedList<T>::insertAt(size_t index, const T &value) {
 	- if index = 0 -> prepend
 	- if index = size -> append
 	if list is empty, it doesn't matter, value is first element
+
+	wenn index == 0 && empty(): m_Head = new_node
 	*/
 
 	if (index > size()) {
@@ -164,9 +235,11 @@ void LinkedList<T>::insertAt(size_t index, const T &value) {
 	}
 
 	Node *new_node = new Node(value);
+		
 	if (empty()) {
 		throw std::runtime_error("list is empty, cant be inserted at index");
 	}
+
 	if (index == 0) {
 		prepend(value);
 		return;
@@ -182,6 +255,7 @@ void LinkedList<T>::insertAt(size_t index, const T &value) {
 		new_node->next = run->next;
 		run->next = new_node;
 
+		return;
 	}
 }
 
@@ -206,7 +280,7 @@ void LinkedList<T>::deleteAt(size_t index) {
 		}
 		// now i am at the position before i should delete the node
 		Node *temp = run->next;
-		run->next = run->next->next;
+		run->next = temp->next;
 
 		delete temp;
 	}
@@ -214,7 +288,6 @@ void LinkedList<T>::deleteAt(size_t index) {
 
 template<typename T>
 std::ostream& operator<<(std::ostream& out, const LinkedList<T> &other) {
-    out << "Linked List:" << std::endl;
     typename LinkedList<T>::Node *run = other.m_Head;
     while (run) {
         out << "--[" << run->value << "]--";
@@ -241,7 +314,7 @@ T* LinkedList<T>::Iterator::operator->() const { return m_Current->value; }
 template<typename T>
 typename LinkedList<T>::Iterator& LinkedList<T>::Iterator::operator++() { 	// prefix increment
 	if (m_Current == nullptr) {
-		throw std::runtime_error("trying to access nullptr");
+		throw std::runtime_error("trying to access nullptr, maybe end of list");
 	} else {
 		m_Current = m_Current->next;
 		return *this;
@@ -255,7 +328,7 @@ typename LinkedList<T>::Iterator LinkedList<T>::Iterator::operator++(int) {	// p
 		m_Current = m_Current->next;
 		return *before;
 	} else {
-		return m_Current = nullptr;
+		return Iterator(nullptr); // return maybe end()
 	}
 }
 
@@ -263,10 +336,11 @@ template<typename T>
 bool LinkedList<T>::Iterator::operator==(const Iterator &other) const {
 	return m_Current == other.m_Current;
 }
-
+ 
 template<typename T>
 bool LinkedList<T>::Iterator::operator!=(const Iterator &other) const {
 	return !(m_Current == other.m_Current);
+	// change other stuff
 }
 
 template<typename T>
