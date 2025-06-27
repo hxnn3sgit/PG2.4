@@ -15,13 +15,7 @@ std::ostream& operator<<(std::ostream& out, const Token &other) {
 }
 
 bool is_operator(char c) {
-	if(c == '+' || c == '-' || c == '/' || c == '*')
-		return true;
-	else
-		return false;
-
-	// könnte ich auch schreiben?:
-	// return (c == '+' || c == '-' || c == '/' || c == '*');
+	return (c == '+' || c == '-' || c == '/' || c == '*');
 }
 
 std::vector<Token> tokenize(std::istream &in) {
@@ -32,31 +26,39 @@ std::vector<Token> tokenize(std::istream &in) {
 	std::vector<Token> tokens;
 	char current_token_c;
 
-	while (current_token_c = in.get()) {
+	while ( (current_token_c = in.get()) != '\n' && current_token_c != EOF) {
 		// main loop, goes through input stream, char by char, building tokens an appending them to arr
 		std::string token;
 		if (isdigit(current_token_c)) { 
-			token.push_back(current_token_c);
-			while (isdigit( (current_token_c = in.get()) )) // as long as c is a number, get c and push back it to token
-				token.push_back(current_token_c);
-
-			int num_token = std::stoi(token);
-			Token numeric_token(num_token);
+			in.putback(current_token_c);
+			int number;
+			in >> number;
+			Token numeric_token(number);
 			tokens.push_back(numeric_token);
-				
 		} else if (is_operator(current_token_c)) {
 			Token op_token(current_token_c);
 			tokens.push_back(op_token);
-		} else if (isalpha(current_token_c)) {
+		} else if (isalpha(current_token_c) || current_token_c == '_') {
 			// variables:
-			
-		} else {
-			throw invalid_char();
+			token.push_back(current_token_c);
+			while ( current_token_c = in.get()) {
+				if (isalpha(current_token_c) || current_token_c == '_') {
+					token.push_back(current_token_c);
+				} else {
+					in.putback(current_token_c);
+					break;
+				}	
+			}
+			Token varname_token(token);
+			tokens.push_back(varname_token);
+		} else if (isspace(current_token_c)) {
+			continue;
 		}
-
-
+		 else {
+			// throw invalid_char();
+			std::cerr << "unparsed" << std::endl;
+		}
 	}
-
 
 	return tokens;
 }

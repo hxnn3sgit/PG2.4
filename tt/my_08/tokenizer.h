@@ -6,14 +6,14 @@
 class Token {
     enum class TokenType { NUMBER, OPERATOR, VARIABLE };
     TokenType Type;
-    int Value;
-    char Op;
+    int Value = 0;
+    char Op = '\0';
     std::string VariableName;
 public:
     Token() = delete;
-    Token(const int number) : Value(number) {}
-    Token(const char op) : Op(op) {}
-    Token(const std::string varName) : VariableName(varName) {}
+    Token(const int number) : Value(number), Type(TokenType::NUMBER) {}
+    Token(const char op) : Op(op), Type(TokenType::OPERATOR) {}
+    Token(const std::string varName) : VariableName(varName), Type(TokenType::VARIABLE) {}
 
     friend std::ostream& operator<<(std::ostream &out, const Token &other);
 };

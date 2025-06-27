@@ -19,7 +19,8 @@ int main(int argc, char **argv) {
 		std::cout << "using iterators:" << std::endl;
 		for (DynArr<int>::Iterator it = my_dyn_arr.begin(); it != my_dyn_arr.end(); it++) {
 
-		} 
-		*/
+		}
+	   	*/	
+	}
 }
 
