@@ -17,7 +17,7 @@ int main() {
 
 	print_all(my_vec);
 
-	dyn_arr<int> my_dyn_arr;
+	DynArr<int> my_dyn_arr;
 
 	my_dyn_arr.push_data_back(1);
 	my_dyn_arr.push_data_back(2);

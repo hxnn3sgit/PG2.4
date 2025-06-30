@@ -4,6 +4,7 @@
 using std::cout, std::endl, std::string;
 
 class custom_exception : public std::exception {
+public:
 	virtual const char *what() const noexcept {
 		return "custom exception text out of custom exception class";
 	}
