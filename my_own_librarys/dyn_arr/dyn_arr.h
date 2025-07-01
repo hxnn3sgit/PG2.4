@@ -100,7 +100,7 @@ public:
 	
 	Iterator begin();
 	Iterator end();
-	Iterator beginn() const;
+	Iterator begin() const;
 	Iterator end() const;
 
 	template<typename U>
@@ -239,48 +239,51 @@ T* DynArr<T>::Iterator::operator->() {
 
 template<typename T>
 typename DynArr<T>::Iterator& DynArr<T>::Iterator::operator++() {
-	if (Current)
-		return *(++this);
-	else
-		return Iterator(nullptr);
+	Current++;
+	return *this;
 }
 
 template<typename T>
 typename DynArr<T>::Iterator DynArr<T>::Iterator::operator++(int) {
-	if (Current) {
-		Iterator before_inc = *this;
-		++this;
-		return before_inc;
-	} else
-		return Iterator(nullptr);
+	Iterator before_inc = Current;
+	Current++;
+	return before_inc;
 }
 
 template<typename T>
 typename DynArr<T>::Iterator& DynArr<T>::Iterator::operator--() {
-	if (Current)
-		return *(--this);
-	else
-		return Iterator(nullptr); // should return start somehow
+	Current--;
+	return *this;
 }
 
 template<typename T>
 typename DynArr<T>::Iterator DynArr<T>::Iterator::operator--(int) {
-	if (Current) {
-		Iterator before_dec = Current;
-		--Current;
-		return before_dec;
-	}
+	Iterator before_dec = *this;
+	Current--;
+	return before_dec;
 }
 
 template<typename T>
 bool DynArr<T>::Iterator::operator==(const Iterator &other) const {
-	return (*Current == other.Current);
+	return (Current == other.Current);
 }
 
 template<typename T>
 bool DynArr<T>::Iterator::operator!=(const Iterator &other) const {
 	return !(*this == other);
 }
+
+template<typename T>
+typename DynArr<T>::Iterator DynArr<T>::begin() { return Iterator(data); }
+
+template<typename T>
+typename DynArr<T>::Iterator DynArr<T>::end() { return Iterator(data + size); }
+
+template<typename T>
+typename DynArr<T>::Iterator DynArr<T>::begin() const { return Iterator(data); }
+
+template<typename T>
+typename DynArr<T>::Iterator DynArr<T>::end() const { return Iterator(data + size); }
 
 /*
 Iterator(T* start) : cur_elem_ptr(start) {}
