@@ -6,6 +6,10 @@
 #include <thread>
 #include <mutex>
 #include <chrono>
+#include <vector>
+#include <iostream>
+
+// #include "../../../my_own_librarys/dyn_arr/dyn_arr.h"
 
 namespace fs = std::filesystem;
 
@@ -14,6 +18,12 @@ public:
     virtual const char *what() const noexcept {
         return "int could not be converted, are you sure it is an odd int value?";
     }
+};
+
+struct ThreadData {
+    int NumberOfThreads;
+    // what else? never seen this concept
+
 };
 
 
@@ -37,33 +47,54 @@ std::vector<float> calc_blur_values(const png::image<png::rgb_pixel> &my_image, 
     return sum_blur_values;
 }
 
-/*bool at_border_or_corner(png::uint_32 x, png::uint_32 y, png::uint_32 height, png::uint_32 width) {
-    // if x or y or both are zero or max widht/height, return true -> that means youre at a border or corner
-    return ( (x == 0 || y == 0) || (x == 0 && y == 0) || (x == height - 1 || y == width - 1) || (x == height - 1 && y == width - 1) );
-}*/
-
-png::image< png::rgb_pixel > blur_picture(const std::string &filename, const int kernel_size = 3) {
-    png::image<png::rgb_pixel> input_image(filename);
-    png::image<png::rgb_pixel> output_image(input_image.get_width(), input_image.get_height());
+void process_image_section(const png::image<png::rgb_pixel> &input_image, png::image<png::rgb_pixel> &output_image, const int kernel_size, png::uint_32 y_start, png::uint_32 y_end) {
+    png::uint_32 i_height = input_image.get_height();
+    png::uint_32 i_width = input_image.get_width();
 
     float blur_value = 0.0;
-    for (png::uint_32 y = kernel_size/2; y < input_image.get_height() - (kernel_size/2+1); ++y) {
-        for (png::uint_32 x = kernel_size/2;  x < input_image.get_width() - (kernel_size/2 + 1); ++x) {
-                std::vector<float> blur_values = calc_blur_values(input_image, x, y, kernel_size);
+
+    for (png::uint_32 y = y_start; y < y_end; ++y) {
+        for (png::uint_32 x = kernel_size / 2; x < i_width - (kernel_size / 2 + 1); ++x) {
+            std::vector<float> blur_values = calc_blur_values(input_image, x, y, kernel_size);
                 int r = blur_values.at(0);
                 int g = blur_values.at(1);
                 int b = blur_values.at(2);
 
                 r = (r > 255) ? 255 : r;
-                g = (g > 255) ? 255 : g;  
+                g = (g > 255) ? 255 : g;
                 b = (b > 255) ? 255 : b;
 
                 output_image.set_pixel(x, y, png::rgb_pixel(r, g, b));
         }
     }
+}
+
+png::image<png::rgb_pixel> blur_picture_parallel(const fs::path &filename, const int kernel_size = 3, const int number_of_threads = 2) {
+    png::image<png::rgb_pixel> input_image(filename);
+    png::uint_32 i_height = input_image.get_height();
+    png::uint_32 i_width = input_image.get_width();
+    
+    std::vector<std::thread> threads;
+    png::image<png::rgb_pixel> output_image(i_width, i_height);
+
+    /*
+        - create a copy of the input picture: this is the picture where blur pixels are written
+        - pass it in process_image_section to safe the blur pixels
+    */
+
+    png::uint_32 valid_start = kernel_size / 2;
+    png::uint_32 valid_end = i_height - ((kernel_size / 2) + 1);
+    png::uint_32 middle = (valid_start + valid_end) / 2;
+
+    threads.push_back(std::thread(process_image_section, std::ref(input_image), std::ref(output_image), kernel_size, valid_start, middle));
+    threads.push_back(std::thread(process_image_section, std::ref(input_image), std::ref(output_image), kernel_size, middle, valid_end));
+
+    for (auto &thread : threads) 
+        thread.join(); // waits, until every thread is done doing their work
 
     return output_image;
 }
+
 
 int parse_int(char* argv_2) {
     int parsed_int;
@@ -74,11 +105,16 @@ int parse_int(char* argv_2) {
     }
 
     return parsed_int;
-} 
+}
+
+
+void measure_performance (/* some chrono time parameters */);
+
 
 int main(int argc, char **argv) {
     if (argc != 3) {
-        std::cerr << "[ERROR]: i need args, 1st: filename; 2nd: kernel size\n";
+        std::cerr << "[ERROR]: i need args, 1st: filename; 2nd: kernel size\n"; // later 3rd, thread number
+		return EXIT_FAILURE;
     } else {
         fs::path filename = argv[1];
         if (fs::exists(filename)) {
@@ -88,17 +124,19 @@ int main(int argc, char **argv) {
                     std::cerr << "[ERROR]: Kernel size has to be odd!\n";
                     return EXIT_FAILURE;
                 }
-                png::image< png::rgb_pixel > blurred_image = blur_picture(filename, kernel_size);
-                std::cout << "[LOGGER]: Picture is getting Blurred\n";
+                png::image< png::rgb_pixel > blurred_image = blur_picture_parallel(filename, kernel_size);
+                std::cout << "[LOGGER]: Picture is getting Blurred with 2 threads\n";
                 blurred_image.write("blurred_" + filename.string());
                 std::cout  << "[LOGGER]: Picture was saved\n";
             } catch (convert_error &e) {
                 std::cerr << "[ERROR]: exception occured: " << e.what() << std::endl;
+                return EXIT_FAILURE;
             }
         } else {
             std::cerr << "[ERROR]: no picture with name " << filename << " exists\n";
+			return EXIT_FAILURE;
         }
     }
 
-    return 0;
+    return EXIT_SUCCESS;
 }

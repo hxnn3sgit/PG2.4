@@ -7,9 +7,9 @@ LDFLAGS = `libpng-config --ldflags`
 DEBUG_CXXFLAGS = -ggdb3 -O0 `libpng-config --cflags`
 
 # Target und Quellcode
-TARGET = blurring
-DEBUG_TARGET = blurring_debug
-SOURCES = blurring.cpp
+TARGET = parallel_blurring
+DEBUG_TARGET = parallel_blurring_debug
+SOURCES = parallel_blurring.cpp
 OBJECTS = $(SOURCES:.cpp=.o)
 DEBUG_OBJECTS = $(SOURCES:.cpp=_debug.o)
 
