@@ -184,7 +184,7 @@ void LinkedList<T>::prepend(const T &value) {
 }
 
 template <typename T>
-void LinkedList<T>::popFront() {
+void LinkedList<T>::popFront() { // keine Fehlerbehandlung!
 	try {
 		deleteAt(0);
 	} catch (std::runtime_error &e) {

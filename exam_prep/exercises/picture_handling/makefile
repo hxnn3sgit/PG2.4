@@ -1,5 +1,5 @@
 # Compiler und Flags
-CXX = g++
+CXX = g++ -std=c++17
 CXXFLAGS = `libpng-config --cflags`
 LDFLAGS = `libpng-config --ldflags`
 

@@ -9,8 +9,6 @@
 #include <vector>
 #include <iostream>
 
-// #include "../../../my_own_librarys/dyn_arr/dyn_arr.h"
-
 namespace fs = std::filesystem;
 
 class convert_error : public std::exception {
@@ -82,12 +80,41 @@ png::image<png::rgb_pixel> blur_picture_parallel(const fs::path &filename, const
         - pass it in process_image_section to safe the blur pixels
     */
 
-    png::uint_32 valid_start = kernel_size / 2;
+    /*png::uint_32 valid_start = kernel_size / 2;
     png::uint_32 valid_end = i_height - ((kernel_size / 2) + 1);
-    png::uint_32 middle = (valid_start + valid_end) / 2;
+    png::uint_32 middle = (valid_start + valid_end) / 2;*/
 
+    std::vector<png::uint_32> middle_points;
+
+    png::uint_32 beginning = kernel_size / 2;
+    png::uint_32 step = i_height / number_of_threads;
+
+    middle_points.push_back(beginning);
+
+    png::uint_32 middle = beginning;
+
+    for (int i = 1; i < number_of_threads - 1; ++i) { // first and last will be caluculated out of for loop
+        middle += step;
+        middle_points.push_back(middle);
+        middle += 1;
+    }
+
+    png::uint_32 end = i_height - ((kernel_size / 2) + 1);
+
+    /*
     threads.push_back(std::thread(process_image_section, std::ref(input_image), std::ref(output_image), kernel_size, valid_start, middle));
     threads.push_back(std::thread(process_image_section, std::ref(input_image), std::ref(output_image), kernel_size, middle, valid_end));
+    */
+
+    // starting first thread manually
+    threads.push_back(std::thread(process_image_section, std::ref(input_image), std::ref(output_image), kernel_size, beginning, middle_points[0]));
+
+    for (int i = 1; i < number_of_threads - 1; ++i) {
+        threads.push_back(std::thread(process_image_section, std::ref(input_image), std::ref(output_image), kernel_size, middle_points[i], middle_points[i + 1]));
+    }
+
+    // starting last thread manually
+    threads.push_back(std::thread(process_image_section, std::ref(input_image), std::ref(output_image), kernel_size, middle_points[number_of_threads - 1], end));
 
     for (auto &thread : threads) 
         thread.join(); // waits, until every thread is done doing their work
@@ -108,26 +135,35 @@ int parse_int(char* argv_2) {
 }
 
 
-void measure_performance (/* some chrono time parameters */);
+auto measure_performance (const auto &t_start, const auto &t_end) {
+    auto duration = t_end - t_start;
+    return std::chrono::duration_cast<std::chrono::milliseconds>(duration);
+}
+
 
 
 int main(int argc, char **argv) {
-    if (argc != 3) {
-        std::cerr << "[ERROR]: i need args, 1st: filename; 2nd: kernel size\n"; // later 3rd, thread number
+    if (argc != 4) {
+        std::cerr << "[ERROR]: i need args, 1st: filename; 2nd: kernel size; 3rd: number of threads\n"; // later 3rd, thread number
 		return EXIT_FAILURE;
     } else {
         fs::path filename = argv[1];
         if (fs::exists(filename)) {
             try {
                 int kernel_size = parse_int(argv[2]);
-                if (kernel_size % 2 == 0) {
-                    std::cerr << "[ERROR]: Kernel size has to be odd!\n";
+                int number_of_threads = parse_int(argv[3]);
+                if (kernel_size % 2 == 0 || number_of_threads > 4 || (kernel_size % 2 == 0 && number_of_threads)) {
+                    std::cerr << "[ERROR]: Kernel size has to be odd and thread size has to be smaller than 5!\n";
                     return EXIT_FAILURE;
                 }
-                png::image< png::rgb_pixel > blurred_image = blur_picture_parallel(filename, kernel_size);
+                auto t_start = std::chrono::high_resolution_clock::now();
+                png::image< png::rgb_pixel > blurred_image = blur_picture_parallel(filename, kernel_size, number_of_threads);
+                auto t_end = std::chrono::high_resolution_clock::now();
+                auto threading_duration = measure_performance(t_start, t_end);
                 std::cout << "[LOGGER]: Picture is getting Blurred with 2 threads\n";
                 blurred_image.write("blurred_" + filename.string());
-                std::cout  << "[LOGGER]: Picture was saved\n";
+                std::cout << "[LOGGER]: Picture was saved\n";
+                std::cout << "blurring took " << threading_duration.count() << " ms.\n";
             } catch (convert_error &e) {
                 std::cerr << "[ERROR]: exception occured: " << e.what() << std::endl;
                 return EXIT_FAILURE;

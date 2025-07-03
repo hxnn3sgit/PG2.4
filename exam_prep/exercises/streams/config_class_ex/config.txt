@@ -1,0 +1,6 @@
+# Generierte Konfigurationsdatei
+
+  # Ein paar Einstellungen
+fullscreen = false
+user = hannes
+version = 1.2.3
