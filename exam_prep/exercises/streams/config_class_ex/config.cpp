@@ -25,7 +25,7 @@ std::optional<std::string> Config::get(const std::string &key) const {
 
 void Config::set(const std::string &key, const std::string &value) {
 	std::pair<std::string, std::string> pair_to_insert(key, value);
-	data_.insert_or_assign(pair_to_insert);
+	data_.insert_or_assign(key, value);
 }
 
 std::ostream& operator<<(std::ostream &os, const Config &cfg) {
@@ -35,12 +35,13 @@ std::ostream& operator<<(std::ostream &os, const Config &cfg) {
 	return os;
 }
 
-bool is_comment(const std::string line) {
+bool is_comment_or_empty(const std::string line) {
 	std::istringstream iss(line);
 	std::string first_token;
 	iss >> first_token;
+	std::cout << "first_token: " << first_token << std::endl;
 	
-	if (first_token == "#")
+	if (first_token == "#" || line == "" || line == " ")
 		return true;
 	else
 		return false;
@@ -54,16 +55,17 @@ std::istream& operator>>(std::istream &is, Config &cfg) {
 	
 	std::string line;
 	while (std::getline(is, line)) { // goes until newline character
-		if (!is_comment(line)) {
+		if (!is_comment_or_empty(line)) {
 			// process every line in there
 			std::istringstream iss(line);
 		
-			std::string word;
-			while (iss >> word) {
-				std::cout << "[LOGGER INFO:] word is going to be processed: " << word << std::endl;
-				word += " ";
-				is >> word;
-			}
+			std::string key, equals, value;
+			
+			iss >> key;
+			iss >> equals;
+			iss >> value;
+			
+			cfg.set(key, value);
 		}
 	}
 

@@ -3,8 +3,12 @@
 #include <exception>
 #include <vector>
 
+#pragma once
+
 class Token {
+public:
     enum class TokenType { NUMBER, OPERATOR, VARIABLE };
+private: 
     TokenType Type;
     int Value = 0;
     char Op = '\0';
@@ -14,6 +18,12 @@ public:
     Token(const int number) : Value(number), Type(TokenType::NUMBER) {}
     Token(const char op) : Op(op), Type(TokenType::OPERATOR) {}
     Token(const std::string varName) : VariableName(varName), Type(TokenType::VARIABLE) {}
+
+	TokenType getTokenType() { return Type; }
+
+    bool isNumber() const { return Type == TokenType::NUMBER; }
+    bool isOperator() const { return Type == TokenType::OPERATOR; }
+    bool isVariable() const { return Type == TokenType::VARIABLE; }
 
     friend std::ostream& operator<<(std::ostream &out, const Token &other);
 };
