@@ -21,6 +21,9 @@ public:
 
 	TokenType getTokenType() { return Type; }
 
+    int getValue() const { return Value; }
+    char getOperator() const { return Op; }
+
     bool isNumber() const { return Type == TokenType::NUMBER; }
     bool isOperator() const { return Type == TokenType::OPERATOR; }
     bool isVariable() const { return Type == TokenType::VARIABLE; }

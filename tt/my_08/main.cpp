@@ -19,8 +19,16 @@ int main(int argc, char **argv)  {
 
 	if (math::syntax_check(my_tokens)) {
 		std::cout << "[LOGGER]: syntax check successful.\n";
-		float result = math::simple_eval_ltr(my_tokens);
-		std::cout << "[LOGGER]: Result: " << result << std::endl;
+		try {
+			float result = math::simple_eval_ltr(my_tokens);
+			std::cout << "[LOGGER]: Result: " << result << std::endl;
+		} catch (division_by_zero &e) {
+			std::cerr << "exception occured: " << e.what() << std::endl;
+			return EXIT_FAILURE;
+		} catch (std::logic_error &e) {
+			std::cerr << "exception occured: " << e.what() << std::endl;
+			return EXIT_FAILURE;
+		}
 	} else {
 		std::cerr << "[ERROR]: syntax check failed!\n";
 		return EXIT_FAILURE;

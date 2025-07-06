@@ -21,7 +21,33 @@ bool math::syntax_check(const std::vector<Token> &calc_tokens) {
 	return true;
 }
 
+float calc_value(Token lhs, Token op, Token rhs) {
+	float lhs_value = lhs.getValue();
+	float rhs_value = rhs.getValue();
+	char calc_op = op.getOperator();
+
+	switch(calc_op) {
+		case '+':
+			return lhs_value + rhs_value;
+		case '-':
+			return lhs_value - rhs_value;
+		case '*':
+			return lhs_value * rhs_value;
+		case '/':
+			if (rhs_value == 0)
+				throw division_by_zero("cannot divide by zero");
+		default:
+			throw std::logic_error("invalid calc operator"); 
+	}
+
+
+}
+
 float math::simple_eval_ltr(const std::vector<Token> &tokens) {
-	
-	return 1.0;
+	float result = 0.0;
+	for (int i = 0; i < tokens.size() - 2; ++i) {
+		result += calc_value(tokens[i], tokens[i+1], tokens[i+2]);
+	}
+
+	return result;
 }
