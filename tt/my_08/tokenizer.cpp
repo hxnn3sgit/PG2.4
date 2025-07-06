@@ -55,8 +55,8 @@ std::vector<Token> tokenize(std::istream &in) {
 			continue;
 		}
 		 else {
-			// throw invalid_char();
-			std::cerr << "unparsed" << std::endl;
+			throw std::invalid_argument("invalid character skipping this term: " + std::string(1, current_token_c));
+			
 		}
 	}
 
