@@ -1,0 +1,91 @@
+/*
+Altklausur a1:
+
+1.1:
+g++ -std=c++14 my-program.cpp -o prog
+
+1.2:
+./prog
+
+1.3:
+#include <iostream>
+
+int main() {
+	std::cout << "Hello World" << std::endl;
+
+	return 0;
+}
+
+
+2 a:
+Bei delete wird nur ein Destruktor aufgerufen, bei delete [] werden mehrere Destruktoren aufgerufen.
+Die Anzahl der aufzurufenden Desktruktoren ist irgendwo im Speicher abgelegt.
+
+2 b:
+der output ist 0, da x von 10 auf 0 gesetzt wird in g(x). f(x) hat keinen Einfluss auf die Variable, da sie
+by value, also per Kopie erstellt wird. Es wird nur der kopierte Wert in f(x) geändert, nicht der Wert in g(x). 
+Außerdem gibt die Funktion keinen anderen Wert zurück, da sie den rückgabetyp void hat. 
+Somit ändert nur die Zuweisung x = 0; den Wert der Variable
+
+2 c:
+In c++ kann man auch malloc und free benutzen, allerdings nur wenn man den header cstdlib einbindet mit 
+#include <cstdlib>. Jedoch muss man das Ergebnis des malloc aufrufes casten, da es, anders als in C, einen void
+pointer returnt. new und delete sind jedoch c++ idiomatisch und es ist nicht empfehlenswert, malloc und delete
+zu verwenden, da malloc nur einen nullptr zurückgibt, falls die speicherreservierung fehlschlägt.
+new würde eine std::bad_alloc exception werfen und somit eine bessere Fehlerbehandlung ermöglichen
+
+2 d:
+deklarationen:
+void f(int x);
+static int g;
+void c::m(int x);
+
+definitionen:
+void f(int x) { std::cout << "hello from f\n"; }
+static int g = 10;
+void c::m(int x) { std::cout << "hello from c::m\n"; }
+
+3 a:
+Methoden sind Memberfunktionen einer Klasse und mit dem Keyword virtual deklariert/definiert.
+Sie ermöglichen Polymorphismus, das bedeutet, dass der Kompiler bei Laufzeit entscheiden kann, welche
+Methode er für welches instantiiertes Objekt einer Klasse aufruft (mit V-Table und virtual pointern).
+Methoden können überschrieben werden,
+Dazu gibt man zur Lesbarkeit auch oft das keyword override in der deklaration/definition an, dies ist nicht
+zwingend für den Compiler nötig, jedoch führt es zur besseren Lesbarkeit. Außerdem können z.B. Schreibfehler
+beim Definieren einer Klasse entdeckt werden, falls eine Methode überschrieben werden soll, aber ein Buchstabe
+von der zu überschreibenden Methode abweicht, wirft der Compiler einen Fehler.
+
+3 b:
+Eine abstrakte Klasse ist eine Klasse, die mindestens eine pure virtual funktion bereitstellt. Eine pure virtual
+function ist eine Funktion, die keine Definition implementiert und Kindklassen dazu zwingt, die pure virtual
+methode zu implementieren. Von einer abstrakten Klasse können keine Objekte instantiiert werden
+
+class abstract {
+private:
+	int my_int = 0;
+public:
+	abstract(int x) : my_int(x) {}
+	virtual void print_int_value() = 0;
+	virtual void say_hello_from_class() { std::cout << "hello from abstract class\n"; }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
