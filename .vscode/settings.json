@@ -93,6 +93,7 @@
         "syncstream": "cpp",
         "thread": "cpp",
         "typeindex": "cpp",
-        "valarray": "cpp"
+        "valarray": "cpp",
+        "ciso646": "cpp"
     }
 }

@@ -26,7 +26,7 @@ std::vector<Token> tokenize(std::istream &in) {
 	std::vector<Token> tokens;
 	char current_token_c;
 
-	while ( (current_token_c = in.get()) != '\n' && current_token_c != EOF) {
+	while (in.get(current_token_c)) {
 		// main loop, goes through input stream, char by char, building tokens an appending them to arr
 		std::string token;
 		if (isdigit(current_token_c)) { 

@@ -3,8 +3,9 @@
 #include <sstream>
 #include "tokenizer.h"
 #include "calc.h"
+#include "expression_tree.h"
 
-// new main aufgabe 4:
+// new main aufgabe 4: /
 int main(int argc, char **argv) {
 
 	
@@ -24,7 +25,7 @@ int main(int argc, char **argv) {
 
 			if (math::syntax_check(calc_tokens)) {
 				try {
-					float result = math::simple_eval_ltr(calc_tokens);
+					float result = math::proper_eval(calc_tokens);
 					std::cout << "[LOGGER:] result: " << result << "; ";
 				} catch (division_by_zero &e) {
 					std::cerr << "exception occured, skipping: " << e.what() << std::endl;

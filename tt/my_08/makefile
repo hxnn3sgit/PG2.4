@@ -5,11 +5,11 @@ DEBUG_CXXFLAGS = -ggdb3 -O0
 LDFLAGS =
 
 # Quelldateien
-SOURCES = main.cpp tokenizer.cpp calc.cpp
+SOURCES = main.cpp tokenizer.cpp calc.cpp expression_tree.cpp
 
 # Zieldateien
-TARGET = program
-DEBUG_TARGET = program_debug
+TARGET = calc
+DEBUG_TARGET = todebug-calc
 
 # Objektdateien
 OBJECTS = $(SOURCES:.cpp=.o)

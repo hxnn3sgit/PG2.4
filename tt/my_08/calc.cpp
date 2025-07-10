@@ -1,4 +1,6 @@
 #include "calc.h"
+#include "expression_tree.h"
+
 #include <string>
 
 bool math::syntax_check(const std::vector<Token> &calc_tokens) {
@@ -14,7 +16,7 @@ bool math::syntax_check(const std::vector<Token> &calc_tokens) {
 		else if (expected_token == Token::TokenType::OPERATOR)
 			expected_token = Token::TokenType::NUMBER;
 		else if (expected_token == Token::TokenType::VARIABLE)
-			expected_token == Token::TokenType::OPERATOR;
+			expected_token = Token::TokenType::OPERATOR;
 		else	
 			return false;
 	}
@@ -57,4 +59,11 @@ float math::simple_eval_ltr(const std::vector<Token> &tokens) {
 	}
 
 	return result;
+}
+
+float math::proper_eval(const std::vector<Token> &tokens) {
+	expressionTree tree;
+	expressionTree *my_tree = tree.build_expression_tree(tokens);
+
+	return 0.0;
 }

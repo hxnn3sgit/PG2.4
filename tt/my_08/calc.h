@@ -1,6 +1,7 @@
 #pragma once
 
 #include "tokenizer.h"
+#include "expression_tree.h"
 
 class division_by_zero : public std::exception {
 private:
@@ -15,4 +16,5 @@ public:
 namespace math {
 	bool syntax_check(const std::vector<Token> &calc_tokens);
 	float simple_eval_ltr(const std::vector<Token> &tokens);
+	float proper_eval(const std::vector<Token> &tokens);
 };
